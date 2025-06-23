@@ -99,5 +99,5 @@ YearUp – tutor and peers
 OpenAI’s ChatGPT – AI assistance in planning, code explanations, and README drafting
 Spring Boot, MySQL, Bootstrap, Axios, Mustache, and other open-source libraries
 
-👩‍💻 Author
-Bilenie Mekbib – Capstone Project (YearUp / Java Back-End Track
+## 👩‍💻 Author
+Bilenie Tilahun – Capstone Project (YearUp / Java Back-End Track
