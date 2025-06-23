@@ -19,13 +19,14 @@ public class ProductsController
     private ProductDao productDao;
 
     @Autowired
+    //Constructor
     public ProductsController(ProductDao productDao)
     {
         this.productDao = productDao;
     }
 
-    @GetMapping("/products")// the Request path was empty
-    @PreAuthorize("permitAll()")
+    @GetMapping()// get all product
+    @PreAuthorize("permitAll()") // allowed to all
     public List<Product> search(@RequestParam(name="cat", required = false) Integer categoryId,
                                 @RequestParam(name="minPrice", required = false) BigDecimal minPrice,
                                 @RequestParam(name="maxPrice", required = false) BigDecimal maxPrice,
@@ -42,8 +43,8 @@ public class ProductsController
         }
     }
 
-    @GetMapping("{id}")
-    @PreAuthorize("permitAll()")
+    @GetMapping("{id}") //Get product by the ID specify
+    @PreAuthorize("permitAll()") // open to users and admin
     public Product getById(@PathVariable int id )
     {
         try
@@ -62,7 +63,7 @@ public class ProductsController
     }
 
     @PostMapping// remove the () not using the specify path
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // Only admins can Create
     public Product addProduct(@RequestBody Product product)
     {
         try
@@ -75,8 +76,8 @@ public class ProductsController
         }
     }
 
-    @PutMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("{id}") //This update a product to the database where the ID is specify in the path.
+    @PreAuthorize("hasRole('ROLE_ADMIN')")// Only admins can update
     public void updateProduct(@PathVariable int id, @RequestBody Product product)
     {
         try
@@ -89,8 +90,8 @@ public class ProductsController
         }
     }
 
-    @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("{id}") // This deletes a product from the database by its ID
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // Only admins can delete
     public void deleteProduct(@PathVariable int id)
     {
         try

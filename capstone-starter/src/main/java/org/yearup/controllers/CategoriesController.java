@@ -18,9 +18,16 @@ import java.util.List;
 @CrossOrigin// add annotation to allow cross site origin requests
 public class CategoriesController {
 
-    @Autowired // create an Autowired controller to inject the categoryDao and ProductDao
     private CategoryDao categoryDao;
     private ProductDao productDao;
+
+    //Best practice constructor Dependency injection
+    @Autowired // create an Autowired controller to inject the categoryDao and ProductDao
+    public CategoriesController(CategoryDao categoryDao, ProductDao productDao) {
+        this.categoryDao = categoryDao;
+        this.productDao = productDao;
+    }
+
 
     @GetMapping   // add the appropriate annotation for a get action
     public List<Category> getAll() {
