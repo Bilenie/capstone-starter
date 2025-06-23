@@ -1,5 +1,6 @@
 package org.yearup.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,14 +27,14 @@ public class ShoppingCartController {
     private ShoppingCartDao shoppingCartDao; // Talks to the shopping cart table
     private UserDao userDao;//Talks to the user table
     private ProductDao productDao; // Talks to the product table
-
+//
 //Generate Constructor to sets up the tools, so I can use them
-
-    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
-        this.shoppingCartDao = shoppingCartDao;
-        this.userDao = userDao;
-        this.productDao = productDao;
-    }
+//  @Autowired
+//    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
+//        this.shoppingCartDao = shoppingCartDao;
+//        this.userDao = userDao;
+//        this.productDao = productDao;
+//    }
 
 // each method in this controller requires a Principal object as a parameter
     @GetMapping  // Get everything in the user's cart
