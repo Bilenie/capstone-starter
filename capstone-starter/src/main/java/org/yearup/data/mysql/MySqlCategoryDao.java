@@ -71,7 +71,6 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
                     category.setCategoryId(rs.getInt("Category_id"));
                     category.setName(rs.getString("name"));
                     category.setDescription(rs.getString("description"));
-
                 }
             }
         } catch (SQLException e) {
@@ -80,25 +79,76 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
         return category;
     }
 
-    }
+
 
     @Override
     public Category create(Category category)
     {
-        // create a new category
-        return null;
+        String sql = "INSERT INTO categories c (c.CategoryName) VALUE(?)";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+
+            stmt.setString(1, category.getName());
+
+            stmt.executeUpdate();//it can run without calling the resultset class
+            ResultSet  rs = stmt.getGeneratedKeys();
+
+            if ( rs.next() ) {
+                //Product product = new Product();
+                category.setCategoryId(rs.getInt(1));
+            } return category;
+
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return category;
+
     }
 
     @Override
-    public void update(int categoryId, Category category)
-    {
-        // update category
+    public void update(int categoryId, Category category) {
+        String sql = """
+                    UPDATE products 
+                    SET name = ?, category_id = ?, description = ?
+                    WHERE category_id = ?
+                """;
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, category.getName());
+            stmt.setInt(2, category.getCategoryId());
+            stmt.setString(3, category.getDescription());
+
+//            int rowsAffected = stmt.executeUpdate();
+//            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
+
     @Override
-    public void delete(int categoryId)
-    {
-        // delete category
+    public void delete(int categoryId) {
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement deleteDetails = conn.prepareStatement(
+            """
+                DELETE FROM categories c WHERE category_id = ?;
+                """
+         )) {
+
+                deleteDetails.setInt(1,categoryId);
+                deleteDetails.executeUpdate();
+
+
+//                int rowsAffected = stmt.executeUpdate();
+//                return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Category mapRow(ResultSet row) throws SQLException
