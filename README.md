@@ -94,8 +94,8 @@ DELETE /cart
 
 ## 🙏 Credits
 
-Eric Shwartze – instructor and peers
-YearUp – tutor and peers
+Eric Shwartze – instructor
+YearUp – tutors and peers
 OpenAI’s ChatGPT – AI assistance in planning, code explanations, and README drafting
 Spring Boot, MySQL, Bootstrap, Axios, Mustache, and other open-source libraries
 
