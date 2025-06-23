@@ -16,12 +16,12 @@ import java.util.List;
 @CrossOrigin
 public class ProductsController
 {
+    //set attribute
     private ProductDao productDao;
 
-    @Autowired
     //Constructor
-    public ProductsController(ProductDao productDao)
-    {
+    @Autowired
+    public ProductsController(ProductDao productDao) {
         this.productDao = productDao;
     }
 
