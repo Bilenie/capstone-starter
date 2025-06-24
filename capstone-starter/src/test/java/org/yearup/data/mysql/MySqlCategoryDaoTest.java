@@ -60,6 +60,10 @@ class MySqlCategoryDaoTest extends BaseDaoTestClass {
         assertTrue(result.getCategoryId() > 0, "Should return a generated ID > 0");// Should return the new ID
         assertEquals("Test Category", result.getName(), "Name should match");
         assertEquals("Used for testing", result.getDescription(), "Description should match");
+
+        // Clean up: delete the test category so it doesn't persist in the DB
+        assertDoesNotThrow(() -> categoryDao.delete(result.getCategoryId()),
+                "Cleanup: deleting test category should not throw");
     }
 
     @Test
@@ -99,5 +103,43 @@ class MySqlCategoryDaoTest extends BaseDaoTestClass {
             categoryDao.getById(category.getCategoryId());
         });
         assertTrue(notFound.getMessage().contains("not found"), "After deletion, findById should report not found");
+    }
+
+    @Test
+    void update_shouldModifyExistingCategory() {
+        // Arrange: create a category to update
+        Category cat = new Category();
+        cat.setName("Original");
+        cat.setDescription("Before update");
+        Category created = categoryDao.create(cat);
+
+        // Change its fields
+        created.setName("Updated Name");
+        created.setDescription("After update");
+
+        // Act: perform the update
+        assertDoesNotThrow(() -> categoryDao.update(created.getCategoryId(), created),
+                "Updating an existing category should not throw");
+
+        // Assert: fetch it back and verify changes
+        Category fetched = categoryDao.getById(created.getCategoryId());
+        assertEquals("Updated Name", fetched.getName(), "Name should have been updated");
+        assertEquals("After update", fetched.getDescription(), "Description should have been updated");
+    }
+
+    @Test
+    void update_shouldThrowWhenCategoryNotFound() {
+        // Arrange: pick an ID we know doesn’t exist
+        int missingId = 9999;
+        Category cat = new Category();
+        cat.setName("Nope");
+        cat.setDescription("Does not exist");
+
+        // Act & Assert: expect RuntimeException for missing ID
+        RuntimeException ex = assertThrows(RuntimeException.class,
+                () -> categoryDao.update(missingId, cat),
+                "Updating a non-existent category should throw");
+        assertTrue(ex.getMessage().contains("not found"),
+                "Exception message should indicate 'not found'");
     }
 }

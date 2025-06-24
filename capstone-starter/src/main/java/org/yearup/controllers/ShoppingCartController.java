@@ -3,14 +3,12 @@ package org.yearup.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.ProductDao;
 import org.yearup.data.ShoppingCartDao;
 import org.yearup.data.UserDao;
+import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.User;
 
@@ -27,7 +25,7 @@ public class ShoppingCartController {
     private ShoppingCartDao shoppingCartDao; // Talks to the shopping cart table
     private UserDao userDao;//Talks to the user table
     private ProductDao productDao; // Talks to the product table
-//
+
 //Generate Constructor to sets up the tools, so I can use them
 //  @Autowired
 //    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
@@ -59,6 +57,19 @@ public class ShoppingCartController {
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
 
+   // @PostMapping("/products/{id}")
+//    //@PreAuthorize("hasRole('ROLE_ADMIN')") // Only admins can Create
+//    public Product addProductToCart( @RequestBody Product product) {
+//        try
+//        {
+////           var cart = shoppingCartDao.addItem(id,);
+////            return productDao.create(product);
+//        }
+//        catch(Exception ex)
+//        {
+//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+//        }
+//    }
 
     // add a PUT method to update an existing product in the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)

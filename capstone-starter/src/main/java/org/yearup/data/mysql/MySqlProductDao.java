@@ -20,26 +20,33 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
     public List<Product> search(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, String color) {
         List<Product> products = new ArrayList<>();
 
-        String sql = "SELECT * FROM products " +
-                "WHERE (category_id = ? OR ? = -1) " +
-                "   AND (price <= ? OR ? = -1) " +
-                "   AND (color = ? OR ? = '') ";
+        String sql = """
+                SELECT *
+                  FROM products
+                 WHERE (category_id = ? OR ? = -1)
+                   AND (price >= ? OR ? = -1)
+                   AND (price <= ? OR ? = -1)
+                   AND (color = ? OR ? = '')
+                """;
 
-        categoryId = categoryId == null ? -1 : categoryId;
-        minPrice = minPrice == null ? new BigDecimal("-1") : minPrice;
-        maxPrice = maxPrice == null ? new BigDecimal("-1") : maxPrice;
-        color = color == null ? "" : color;
+        int cat = (categoryId == null) ? -1 : categoryId;
+        BigDecimal min = (minPrice == null) ? new BigDecimal("-1") : minPrice;
+        BigDecimal max = (maxPrice == null) ? new BigDecimal("-1") : maxPrice;
+        String clr = (color == null) ? "" : color;
 
-        try (Connection connection = getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, categoryId);
-            statement.setInt(2, categoryId);
-            statement.setBigDecimal(3, minPrice);
-            statement.setBigDecimal(4, minPrice);
-            statement.setString(5, color);
-            statement.setString(6, color);
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ResultSet row = statement.executeQuery();
+            stmt.setInt(1, cat);
+            stmt.setInt(2, cat);
+            stmt.setBigDecimal(3, min);
+            stmt.setBigDecimal(4, min);
+            stmt.setBigDecimal(5, max);
+            stmt.setBigDecimal(6, max);
+            stmt.setString(7, clr);
+            stmt.setString(8, clr);
+
+            ResultSet row = stmt.executeQuery();
 
             while (row.next()) {
                 Product product = mapRow(row);

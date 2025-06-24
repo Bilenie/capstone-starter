@@ -92,7 +92,7 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
             stmt.setString(1, category.getName());
             stmt.setString(2, category.getDescription());
 
-            // Run the SQL insert
+            // Run the SQL insert =>implement the row affected/*
             stmt.executeUpdate();
 
             // Get the newly generated ID from the database

@@ -51,6 +51,7 @@ public class CategoriesController {
     }
 
     @GetMapping("{id}")// add the appropriate annotation for a get action
+    @PreAuthorize("permitAll()")
     public Category getById(@PathVariable int id)
     {
         // get the category by id
@@ -73,32 +74,19 @@ public class CategoriesController {
 
     // the url to return all products in category 1 would look like this
     // https://localhost:8080/categories/1/products
-    @GetMapping("/categories/{categoryId}/products")
+    @GetMapping("{categoryId}/products")
     @PreAuthorize("permitAll()")
     public List<Product> getProductsById(@PathVariable int categoryId)
     {
         // get a list of product by categoryId
-        try
-        {
-            var category = productDao.listByCategoryId(categoryId);
-
-            if(category == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-            }
-
-            // Get products by categoryId
-            return category;
-        }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-        }
+        return productDao.listByCategoryId(categoryId);
 
     }
 
     // add annotation to call this method for a POST action
     // add annotation to ensure that only an ADMIN can call this function
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public Category addCategory(@RequestBody Category category)
     {
@@ -118,24 +106,35 @@ public class CategoriesController {
     // add annotation to ensure that only an ADMIN can call this function
     @PutMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)// Return 204 No Content on success
     public void updateCategory(@PathVariable int id, @RequestBody Category category)
     {
-        // update the category by id
-        try
-        {
-            categoryDao.create(category);
-        }
-        catch(Exception ex)
-        {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        // Verify it exists (will throw 404 if missing)
+        try {
+            categoryDao.getById(id);
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Category ID " + id + " not found", ex);
         }
 
+        // update
+        try {
+            categoryDao.update(id, category);
+        } catch (RuntimeException ex) {
+            // If your DAO threw because rowsAffected==0, it's unexpected (we already checked exists),
+            // but we still map it to a 500.
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Failed to update category " + id,ex);
+        }
     }
 
     // add annotation to call this method for a DELETE action - the url path must include the categoryId
     // add annotation to ensure that only an ADMIN can call this function
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)// Tell Spring to return 204 if this method completes normally
     public void deleteCategory(@PathVariable int id)
     {
         // delete the category by id
