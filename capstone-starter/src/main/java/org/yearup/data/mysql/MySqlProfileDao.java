@@ -8,21 +8,17 @@ import javax.sql.DataSource;
 import java.sql.*;
 
 @Component
-public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
-{
-    public MySqlProfileDao(DataSource dataSource)
-    {
+public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
+    public MySqlProfileDao(DataSource dataSource) {
         super(dataSource);
     }
 
     @Override
-    public Profile create(Profile profile)
-    {
+    public Profile create(Profile profile) {
         String sql = "INSERT INTO profiles (user_id, first_name, last_name, phone, email, address, city, state, zip) " +
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection connection = getConnection())
-        {
+        try (Connection connection = getConnection()) {
             PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, profile.getUserId());
             ps.setString(2, profile.getFirstName());
@@ -37,9 +33,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao
             ps.executeUpdate();
 
             return profile;
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
