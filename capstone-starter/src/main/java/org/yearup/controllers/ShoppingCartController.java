@@ -8,7 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 import org.yearup.data.ProductDao;
 import org.yearup.data.ShoppingCartDao;
 import org.yearup.data.UserDao;
-import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
 import org.yearup.models.ShoppingCartItem;
 import org.yearup.models.User;
@@ -18,7 +17,7 @@ import java.security.Principal;
 @RestController                      // This class answers HTTP requests from the internet
 @RequestMapping("/cart")            // Every URL here starts with /cart
 @CrossOrigin                        // Let frontend websites talk to this backend
-@PreAuthorize("isAuthenticated()") // Only logged-in users can use these methods
+@PreAuthorize("hasRole('ROLE_USER')") // Only logged-in users can use these methods
 public class ShoppingCartController {
 
 // Set attributes a shopping cart requires
@@ -28,7 +27,7 @@ public class ShoppingCartController {
     private ProductDao productDao; // Talks to the product table
 
 //Generate Constructor to sets up the tools, so I can use them
-  @Autowired
+ @Autowired
     public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
         this.shoppingCartDao = shoppingCartDao;
         this.userDao = userDao;
@@ -37,7 +36,7 @@ public class ShoppingCartController {
 
 // each method in this controller requires a Principal object as a parameter
 
-    @GetMapping  // Get everything in the user's cart
+    @GetMapping// Get everything in the user's cart
     public ShoppingCart getCart(Principal principal) {
         try
         {
@@ -47,7 +46,7 @@ public class ShoppingCartController {
             User user = userDao.getByUserName(userName);
             int userId = user.getId();
 
-            // use the shoppingcartDao to get all items in the cart and return the cart
+            // use the shopping cartDao to get all items in the cart and return the cart
             return shoppingCartDao.getByUserId(userId);
         }
         catch(Exception e)
@@ -59,9 +58,8 @@ public class ShoppingCartController {
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
 
-    @PostMapping("/products/{id}")
-    @PreAuthorize("") // user can add item to the cart
-    public ShoppingCart addProductToCart( Principal principal, @PathVariable("id") int productId) {
+    @PostMapping("/products/{productId}")
+    public ShoppingCart addProductToCart( Principal principal, @PathVariable int productId) {
         try
         {
             // get the currently logged-in username
@@ -93,8 +91,7 @@ public class ShoppingCartController {
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
 
     @PutMapping("/products/{id}") //This update a product to the database where the ID is specify in the path.
-    @PreAuthorize("hasRole('ROLE_ADMIN')")// Only admins can update
-    public void updateProduct(Principal principal, @PathVariable("id") int productId, @RequestBody ShoppingCartItem shoppingCartItem)
+    public ShoppingCart updateProduct(Principal principal, @PathVariable int productId, @RequestBody ShoppingCartItem shoppingCartItem)
     {
         try
         {
@@ -109,6 +106,9 @@ public class ShoppingCartController {
             int userId = user.getId();
 
             shoppingCartDao.updateQuantity(userId,productId,shoppingCartItem.getQuantity());
+
+            return shoppingCartDao.getByUserId(userId);//return the updated cart
+
         }
         catch(Exception ex)
         {
@@ -119,8 +119,7 @@ public class ShoppingCartController {
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
     @DeleteMapping() // This deletes a product from the shopping cart by its ID
-    @PreAuthorize("") // Only admins can delete
-    public void deleteProductFromCart(Principal principal)
+    public ShoppingCart deleteProductFromCart(Principal principal)
     {
         try
         {
@@ -135,6 +134,8 @@ public class ShoppingCartController {
                         "User not found");
             }
             shoppingCartDao.clearCart(userId);
+            return shoppingCartDao.getByUserId(userId);//return the updated cart
+
         }
         catch(Exception ex)
         {
@@ -143,8 +144,7 @@ public class ShoppingCartController {
     }
 
     @DeleteMapping("{id}") // This deletes a product from the database by its ID
-    @PreAuthorize("") // Only admins can delete
-    public void deleteProductFromCartById(Principal principal, @PathVariable("id") int productId)
+    public ShoppingCart deleteProductFromCartById(Principal principal, @PathVariable("id") int productId)
     {
         try
         {
@@ -159,6 +159,7 @@ public class ShoppingCartController {
                         "User not found");
             }
             shoppingCartDao.removeItem(userId,productId);
+            return shoppingCartDao.getByUserId(userId);//return the updated cart
         }
         catch(Exception ex)
         {
