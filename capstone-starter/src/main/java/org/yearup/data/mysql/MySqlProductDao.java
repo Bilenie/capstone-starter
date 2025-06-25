@@ -136,7 +136,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
+        return null;//throw new RuntimeException("Failed to create product: no ID generated or retrieval failed.");
     }
 
     @Override
