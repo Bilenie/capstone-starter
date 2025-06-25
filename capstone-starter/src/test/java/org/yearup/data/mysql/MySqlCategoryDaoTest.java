@@ -112,6 +112,7 @@ class MySqlCategoryDaoTest extends BaseDaoTestClass {
         cat.setName("Original");
         cat.setDescription("Before update");
         Category created = categoryDao.create(cat);
+        int id = created.getCategoryId();
 
         // Change its fields
         created.setName("Updated Name");
@@ -125,6 +126,9 @@ class MySqlCategoryDaoTest extends BaseDaoTestClass {
         Category fetched = categoryDao.getById(created.getCategoryId());
         assertEquals("Updated Name", fetched.getName(), "Name should have been updated");
         assertEquals("After update", fetched.getDescription(), "Description should have been updated");
+
+        assertDoesNotThrow(() -> categoryDao.delete(id),
+                "Cleanup: deleting test category should not throw");
     }
 
     @Test
