@@ -10,6 +10,7 @@ import org.yearup.data.ShoppingCartDao;
 import org.yearup.data.UserDao;
 import org.yearup.models.Product;
 import org.yearup.models.ShoppingCart;
+import org.yearup.models.ShoppingCartItem;
 import org.yearup.models.User;
 
 import java.security.Principal;
@@ -27,14 +28,15 @@ public class ShoppingCartController {
     private ProductDao productDao; // Talks to the product table
 
 //Generate Constructor to sets up the tools, so I can use them
-//  @Autowired
-//    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
-//        this.shoppingCartDao = shoppingCartDao;
-//        this.userDao = userDao;
-//        this.productDao = productDao;
-//    }
+  @Autowired
+    public ShoppingCartController(ShoppingCartDao shoppingCartDao, UserDao userDao, ProductDao productDao) {
+        this.shoppingCartDao = shoppingCartDao;
+        this.userDao = userDao;
+        this.productDao = productDao;
+    }
 
 // each method in this controller requires a Principal object as a parameter
+
     @GetMapping  // Get everything in the user's cart
     public ShoppingCart getCart(Principal principal) {
         try
@@ -46,7 +48,7 @@ public class ShoppingCartController {
             int userId = user.getId();
 
             // use the shoppingcartDao to get all items in the cart and return the cart
-            return null;
+            return shoppingCartDao.getByUserId(userId);
         }
         catch(Exception e)
         {
@@ -57,26 +59,110 @@ public class ShoppingCartController {
     // add a POST method to add a product to the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
 
-   // @PostMapping("/products/{id}")
-//    //@PreAuthorize("hasRole('ROLE_ADMIN')") // Only admins can Create
-//    public Product addProductToCart( @RequestBody Product product) {
-//        try
-//        {
-////           var cart = shoppingCartDao.addItem(id,);
-////            return productDao.create(product);
-//        }
-//        catch(Exception ex)
-//        {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
-//        }
-//    }
+    @PostMapping("/products/{id}")
+    @PreAuthorize("") // user can add item to the cart
+    public ShoppingCart addProductToCart( Principal principal, @PathVariable("id") int productId) {
+        try
+        {
+            // get the currently logged-in username
+            String userName = principal.getName();
+
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+
+            //add validation if user is null
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "User not found");
+            }
+            int userId = user.getId();
+
+            shoppingCartDao.addItem(userId,productId);//add item to the cart
+
+             return shoppingCartDao.getByUserId(userId);//return the updated cart
+        }
+        catch(Exception ex)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+
+    }
 
     // add a PUT method to update an existing product in the cart - the url should be
     // https://localhost:8080/cart/products/15 (15 is the productId to be updated)
     // the BODY should be a ShoppingCartItem - quantity is the only value that will be updated
 
+    @PutMapping("/products/{id}") //This update a product to the database where the ID is specify in the path.
+    @PreAuthorize("hasRole('ROLE_ADMIN')")// Only admins can update
+    public void updateProduct(Principal principal, @PathVariable("id") int productId, @RequestBody ShoppingCartItem shoppingCartItem)
+    {
+        try
+        {
+            // get the currently logged-in username
+            String userName = principal.getName();
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "User not found");
+            }
+            int userId = user.getId();
+
+            shoppingCartDao.updateQuantity(userId,productId,shoppingCartItem.getQuantity());
+        }
+        catch(Exception ex)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
 
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
+    @DeleteMapping() // This deletes a product from the shopping cart by its ID
+    @PreAuthorize("") // Only admins can delete
+    public void deleteProductFromCart(Principal principal)
+    {
+        try
+        {
+            // get the currently logged-in username
+            String userName = principal.getName();
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
 
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "User not found");
+            }
+            shoppingCartDao.clearCart(userId);
+        }
+        catch(Exception ex)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
+
+    @DeleteMapping("{id}") // This deletes a product from the database by its ID
+    @PreAuthorize("") // Only admins can delete
+    public void deleteProductFromCartById(Principal principal, @PathVariable("id") int productId)
+    {
+        try
+        {
+            // get the currently logged-in username
+            String userName = principal.getName();
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "User not found");
+            }
+            shoppingCartDao.removeItem(userId,productId);
+        }
+        catch(Exception ex)
+        {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
 }

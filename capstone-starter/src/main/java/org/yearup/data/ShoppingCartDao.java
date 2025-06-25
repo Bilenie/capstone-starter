@@ -12,4 +12,5 @@ public interface ShoppingCartDao {
     void updateQuantity(int userId, int productId, int quantity);//shopping cart item object or quantity
 
     boolean clearCart(int userId);
+    void removeItem(int userId,int productId);
 }
