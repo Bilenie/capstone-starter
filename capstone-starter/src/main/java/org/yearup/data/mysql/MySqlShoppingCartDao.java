@@ -21,9 +21,9 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     private ProductDao productDao;
 
     @Autowired
-    public MySqlShoppingCartDao(DataSource dataSource,ProductDao productDao) {
+    public MySqlShoppingCartDao(DataSource dataSource, ProductDao productDao) {
         super(dataSource);
-        this.productDao = productDao ;
+        this.productDao = productDao;
 
     }
 
@@ -58,7 +58,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
                 ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
                 shoppingCartItem.setProduct(product);
                 shoppingCartItem.setQuantity(quantity);
-               // shoppingCartItem.setDiscountPercent(BigDecimal.ZERO);
+                // shoppingCartItem.setDiscountPercent(BigDecimal.ZERO);
 
                 // in the shoppingCartItem blueprint the getLineTotal method do the calculation
                 //shoppingCartItem.getLineTotal();
@@ -68,7 +68,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
                 shoppingCart.add(shoppingCartItem);
 
                 //  call the getTotal method to do the total price calculation on the cart
-               // shoppingCart.getTotal();
+                // shoppingCart.getTotal();
 
             }
 
@@ -110,7 +110,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
     }
 
-@Override
+    @Override
     public void updateQuantity(int userId, int productId, int quantity) {
         String sql = """
                 UPDATE 
@@ -137,8 +137,9 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
             throw new RuntimeException(e);
         }
     }
-@Override
-public boolean clearCart(int userId) {
+
+    @Override
+    public boolean clearCart(int userId) {
 
         String sql = """ 
                 
@@ -160,7 +161,7 @@ public boolean clearCart(int userId) {
         }
     }
 
-//Remove specific item from the cart
+    //Remove specific item from the cart
     @Override
     public void removeItem(int userId, int productId) {
         String sql = """
