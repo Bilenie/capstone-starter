@@ -1,14 +1,20 @@
 package org.yearup.data.mysql;
 
 import org.springframework.stereotype.Component;
+import org.yearup.models.Category;
 import org.yearup.models.Profile;
 import org.yearup.data.ProfileDao;
 
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
+
+
+
     public MySqlProfileDao(DataSource dataSource) {
         super(dataSource);
     }
@@ -37,6 +43,36 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
             throw new RuntimeException(e);
         }
     }
+@Override
+    public List<Profile> getAllProfile() {
+
+        //Create am empty list to carry the profiles
+        List<Profile> profiles = new ArrayList<>();
+
+        // SQL to get all columns from the categories table
+        String sql = "SELECT * FROM profiles";
+
+        try (Connection connection = getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            // Go through each row returned from the database
+            while (resultSet.next()) {
+                // Set the properties from the current row
+                Profile profile= mapRow(resultSet);
+
+                // Add it to the list
+               profiles.add(profile);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving categories", e);
+        }
+
+        return profiles;
+    }
+
+    @Override
     public Profile getByUserId(int id){
         String sql = "SELECT p.* FROM profiles p WHERE user_id = ?";
 
@@ -57,7 +93,9 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
             throw new RuntimeException("Error retrieving category with ID: " + id, e);
         }
     }
-    public void Update(int userId,Profile profile){
+
+    @Override
+    public void update(int userId,Profile profile){
         String sql = """
              UPDATE users
                     SET first_name = ?
@@ -97,7 +135,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
         }
     }
 
-    protected static Profile mapRow(ResultSet row) throws SQLException {
+    public static Profile mapRow(ResultSet row) throws SQLException {
         int userId = row.getInt("user_id");
         String firstName = row.getString("first_name");
         String lastName = row.getString("last_name");
@@ -107,6 +145,7 @@ public class MySqlProfileDao extends MySqlDaoBase implements ProfileDao {
         String city = row.getString("city");
         String state = row.getString("state");
         String zip= row.getString("zip");
+
 
         return new Profile(userId, firstName,lastName,phone, email, address, city, state, zip);
     }
