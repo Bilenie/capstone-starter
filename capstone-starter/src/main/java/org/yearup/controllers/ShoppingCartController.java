@@ -17,7 +17,7 @@ import java.security.Principal;
 @RestController                      // This class answers HTTP requests from the internet
 @RequestMapping("/cart")            // Every URL here starts with /cart
 @CrossOrigin                        // Let frontend websites talk to this backend
-@PreAuthorize("hasRole('ROLE_USER')") // Only logged-in users can use these methods
+@PreAuthorize("permitAll()") // Only logged-in users can use these methods
 public class ShoppingCartController {
 
 // Set attributes a shopping cart requires

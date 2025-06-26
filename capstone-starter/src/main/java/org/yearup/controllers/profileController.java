@@ -16,7 +16,7 @@ import java.util.List;
 @RestController// added the annotations to make this a REST controller
 @RequestMapping("profile")// added the annotation to make this controller the endpoint for the following url
 @CrossOrigin// added annotation to allow cross site origin requests =>// http://localhost:8080/profile
-@PreAuthorize("hasRole('ROLE_USER')") // Only logged-in users can use these methods
+@PreAuthorize("permitAll()") // Only logged-in users can use these methods
 public class profileController {
 
     private ProfileDao profileDao;
@@ -33,14 +33,14 @@ public class profileController {
     public Profile getProfileByUserId(Principal principal) {
         // find and return all categories
         try {
-                // get the currently logged-in username
-                String userName = principal.getName();
-                // find database user by userId
-                User user = userDao.getByUserName(userName);
-                int userId = user.getId();
+            // get the currently logged-in username
+            String userName = principal.getName();
+            // find database user by userId
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
 
-                // use the shopping cartDao to get all items in the cart and return the cart
-                return profileDao.getByUserId(userId);
+            // use the shopping cartDao to get all items in the cart and return the cart
+            return profileDao.getByUserId(userId);
 
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
@@ -50,7 +50,6 @@ public class profileController {
 
 
     @PutMapping //This update a profiles to the database
-    @PreAuthorize("hasRole('ROLE_USER')")
     public Profile updateProduct(Principal principal, @RequestBody Profile profile) {
         try {
             // get the currently logged-in username
