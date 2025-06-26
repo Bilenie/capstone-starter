@@ -84,7 +84,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
     @Override
     public ShoppingCartItem addItem(int userId, int productId) {
         ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
-        String sql = "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ? , ?) ON DUPLICATE KEY UPDATE quantity = quantity + 1;";
+        String sql = "INSERT INTO shopping_cart (user_id, product_id, quantity) VALUES (?, ? , 1) ON DUPLICATE KEY UPDATE quantity = quantity + 1;";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -92,7 +92,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
             // Set parameters for name and description
             stmt.setInt(1, userId);
             stmt.setInt(2, productId);
-            stmt.setInt(3, shoppingCartItem.getQuantity());
+            //stmt.setInt(3, shoppingCartItem.getQuantity());
 
             // Run the SQL insert =>implement the row affected/*
             int rowsAffected = stmt.executeUpdate();
@@ -100,11 +100,14 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
             if (rowsAffected > 0) {
                 Product product = productDao.getById(productId);
                 shoppingCartItem.setProduct(product);
+                shoppingCartItem.setQuantity(1);// set the quantity here but might change this one
             }
+            return shoppingCartItem;
+
         } catch (SQLException e) {
             throw new RuntimeException("Failed to insert category", e);
         }
-        return shoppingCartItem;
+
     }
 
 @Override
@@ -172,7 +175,7 @@ public boolean clearCart(int userId) {
             int rowsAffected = statement.executeUpdate();
 
             if (rowsAffected == 0) {
-                System.out.println("No item found to remove for userId = " + userId + " and productId = " + productId);
+                System.out.println("No item found to remove for productId = " + productId);
             }
 
         } catch (SQLException e) {

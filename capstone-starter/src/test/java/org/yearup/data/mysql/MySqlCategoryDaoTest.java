@@ -87,22 +87,18 @@ class MySqlCategoryDaoTest extends BaseDaoTestClass {
     @Test
     public void delete_shouldSucceedWhenIdExists() {
         // Arrange
-        // 1) Insert a temp category to delete
         Category temp = new Category();
         temp.setName("Temp");
         temp.setDescription("To be deleted");
-        Category category = categoryDao.create(temp);  // now temp.getCategoryId() > 0
+        Category created = categoryDao.create(temp);
+        int id = created.getCategoryId();
 
-        // Act
-        // This should not throw
-        assertDoesNotThrow(() -> categoryDao.delete(category.getCategoryId()));
+        // Act: delete the category
+        assertDoesNotThrow(() -> categoryDao.delete(id));
 
-        // Assert
-        // Optionally, verify that findById now throws or returns null
-        RuntimeException notFound = assertThrows(RuntimeException.class, () -> {
-            categoryDao.getById(category.getCategoryId());
-        });
-        assertTrue(notFound.getMessage().contains("not found"), "After deletion, findById should report not found");
+        // Assert: getById should now return null
+        Category result = categoryDao.getById(id);
+        assertNull(result, "After deletion, getById should return null");
     }
 
     @Test

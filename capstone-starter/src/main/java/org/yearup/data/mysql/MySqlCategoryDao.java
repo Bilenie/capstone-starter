@@ -68,9 +68,7 @@ public class MySqlCategoryDao extends MySqlDaoBase implements CategoryDao {
                 if (rs.next()) {
                     return mapRow(rs);
                 } else {
-                    throw new RuntimeException(
-                            "Category ID " + categoryId + " not found. Nothing was retrieved."
-                    );
+                    return null; // Return null so controller throws 404
                 }
             }
 

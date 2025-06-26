@@ -60,15 +60,18 @@ public class CategoriesController {
             var category = categoryDao.getById(id);
 
             if(category == null){
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category with id " + id + " not found");
             }
 
             // Get products by categoryId
-            return categoryDao.getById(id);
+            return category;
+        } catch (ResponseStatusException ex) {
+            throw ex; // re-throw 404
         }
         catch(Exception ex)
         {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred while fetching category with id " + id,
+                    ex);
         }
     }
 
@@ -143,7 +146,7 @@ public class CategoriesController {
             var category = categoryDao.getById(id);
 
             if(category== null)
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found");
 
             categoryDao.delete(id);
         }
