@@ -92,6 +92,39 @@ DELETE /cart
 
 ✅ Unit tests written for DAO and Controller classes
 
+## Why This Controller Rocks 🚀
+
+I love this controller because it’s where the magic happens, connecting the frontend with backend logic! Using Spring Boot’s simple annotations, I built a REST endpoint that fetches user profiles dynamically based on who’s logged in. Working here means I get to bring data to life and see how everything flows smoothly from UI clicks to server responses. Plus, Spring Boot makes it super fun and easy!
+
+```
+@RestController
+@RequestMapping("profile")
+@CrossOrigin
+@PreAuthorize("permitAll()")
+public class profileController {
+
+    private ProfileDao profileDao;
+    private UserDao userDao;
+
+    @Autowired
+    public profileController(ProfileDao profileDao, UserDao userDao) {
+        this.profileDao = profileDao;
+        this.userDao = userDao;
+    }
+
+    @GetMapping
+    public Profile getProfileByUserId(Principal principal) {
+        try {
+            String userName = principal.getName();
+            User user = userDao.getByUserName(userName);
+            int userId = user.getId();
+            return profileDao.getByUserId(userId);
+        } catch (Exception ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
+        }
+    }
+}
+```
 ## 🙏 Credits
 
 Eric Shwartze – instructor
