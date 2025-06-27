@@ -110,6 +110,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
 
     }
 
+    // Update the quantity of a specific product in the cart for a user
     @Override
     public void updateQuantity(int userId, int productId, int quantity) {
         String sql = """
@@ -138,6 +139,7 @@ public class MySqlShoppingCartDao extends MySqlDaoBase implements ShoppingCartDa
         }
     }
 
+    // This clears the entire cart for a specific user
     @Override
     public boolean clearCart(int userId) {
 

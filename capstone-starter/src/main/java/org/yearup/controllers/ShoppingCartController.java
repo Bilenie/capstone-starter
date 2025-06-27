@@ -37,8 +37,13 @@ public class ShoppingCartController {
 // each method in this controller requires a Principal object as a parameter
 
     @GetMapping// Get everything in the user's cart
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ShoppingCart getCart(Principal principal) {
         try {
+            if (principal == null) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must be logged in to view your cart.");
+            }
+
             // get the currently logged-in username
             String userName = principal.getName();
             // find database user by userId
@@ -56,6 +61,7 @@ public class ShoppingCartController {
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
 
     @PostMapping("/products/{productId}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ShoppingCart addProductToCart(Principal principal, @PathVariable int productId) {
         try {
             // get the currently logged-in username
@@ -108,7 +114,7 @@ public class ShoppingCartController {
 
     // add a DELETE method to clear all products from the current users cart
     // https://localhost:8080/cart
-    @DeleteMapping() // This deletes a product from the shopping cart by its ID
+    @DeleteMapping() // This deletes a product from the shopping cart
     public ShoppingCart deleteProductFromCart(Principal principal) {
         try {
             // get the currently logged-in username

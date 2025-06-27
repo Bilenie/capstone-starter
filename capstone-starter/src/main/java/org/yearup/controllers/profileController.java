@@ -16,7 +16,7 @@ import java.util.List;
 @RestController// added the annotations to make this a REST controller
 @RequestMapping("profile")// added the annotation to make this controller the endpoint for the following url
 @CrossOrigin// added annotation to allow cross site origin requests =>// http://localhost:8080/profile
-@PreAuthorize("permitAll()") // Only logged-in users can use these methods
+@PreAuthorize("permitAll()") // users can use these methods
 public class profileController {
 
     private ProfileDao profileDao;

@@ -20,6 +20,8 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
     public List<Product> search(Integer categoryId, BigDecimal minPrice, BigDecimal maxPrice, String color) {
         List<Product> products = new ArrayList<>();
 
+        // BUG FIX  Previously, only one price (<= maxPrice) was checked.
+        // Now fixed to handle BOTH minPrice AND maxPrice correctly.
         String sql = """
                 SELECT *
                   FROM products
@@ -27,7 +29,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
                    AND (price >= ? OR ? = -1)
                    AND (price <= ? OR ? = -1)
                    AND (color = ? OR ? = '')
-                """;
+                """;// Now filters minimum price and filters maximum price
 
         int cat = (categoryId == null) ? -1 : categoryId;
         BigDecimal min = (minPrice == null) ? new BigDecimal("-1") : minPrice;
@@ -83,7 +85,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
         return products;
     }
 
-
+    // Get one product by its ID
     @Override
     public Product getById(int productId) {
         String sql = "SELECT * FROM products WHERE product_id = ?";
@@ -103,6 +105,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
     }
 
     @Override
+    // This adds a new product to the database
     public Product create(Product product) {
 
         String sql = "INSERT INTO products(name, price, category_id, description, color, image_url, stock, featured) " +
@@ -140,6 +143,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
     }
 
     @Override
+    //This update change the existing product by its id
     public void update(int productId, Product product) {
         String sql = "UPDATE products" +
                 " SET name = ? " +
@@ -171,6 +175,7 @@ public class MySqlProductDao extends MySqlDaoBase implements ProductDao {
     }
 
     @Override
+    //this deletes a product from the database by its ID.
     public void delete(int productId) {
 
         String sql = "DELETE FROM products " +

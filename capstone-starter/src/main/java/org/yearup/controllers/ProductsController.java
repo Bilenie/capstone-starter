@@ -15,17 +15,19 @@ import java.util.List;
 @RequestMapping("products")
 @CrossOrigin
 public class ProductsController {
-    //set attribute
+    // DAO to interact with the products table
     private ProductDao productDao;
 
-    //Constructor
+    //Constructor injection of the DAO
     @Autowired
     public ProductsController(ProductDao productDao) {
         this.productDao = productDao;
     }
-
+    // Get all products based on optional filters category, price range, and color
     @GetMapping()// get all product
     @PreAuthorize("permitAll()") // allowed to all
+
+    //Bug Fix1 Verified that search() uses all query parameters correctly.
     public List<Product> search(@RequestParam(name = "cat", required = false) Integer categoryId,
                                 @RequestParam(name = "minPrice", required = false) BigDecimal minPrice,
                                 @RequestParam(name = "maxPrice", required = false) BigDecimal maxPrice,
@@ -67,7 +69,7 @@ public class ProductsController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")// Only admins can update
     public void updateProduct(@PathVariable int id, @RequestBody Product product) {
         try {
-            productDao.create(product);
+            productDao.update(id,product);//Bug Fix2=> Updated to use productDao.update(product) instead of mistakenly calling create(product) which caused duplicates.
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Oops... our bad.");
         }
