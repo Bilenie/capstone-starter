@@ -37,7 +37,7 @@ public class ShoppingCartController {
 // each method in this controller requires a Principal object as a parameter
 
     @GetMapping// Get everything in the user's cart
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ShoppingCart getCart(Principal principal) {
         try {
             if (principal == null) {
@@ -61,7 +61,7 @@ public class ShoppingCartController {
     // https://localhost:8080/cart/products/15 (15 is the productId to be added
 
     @PostMapping("/products/{productId}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
     public ShoppingCart addProductToCart(Principal principal, @PathVariable int productId) {
         try {
             // get the currently logged-in username
